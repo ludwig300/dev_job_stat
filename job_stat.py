@@ -9,11 +9,13 @@ def get_vacancies_from_api_hh(dev_language):
     page = 0
     pages_number = 1
     vacancies = list()
+    moscow_id = '113'
+    count_days = '30'
     while page < pages_number:
         payload = {
             'text': f'Developer {dev_language}',
-            'area': '113',
-            'period': '30',
+            'area': moscow_id,
+            'period': count_days,
             'page': page
         }
         api_url = 'https://api.hh.ru/vacancies'
@@ -73,11 +75,14 @@ def predict_rub_salary_for_superJob(vacancy):
 
 
 def get_vacancies_from_api_sj(language, sj_api_key):
+    moscow_id = '4'
+    developer_catalog_id = 48
+    count_vacancies = 100
     payload = {
         'keyword': f'Программист {language}',
-        'catalogues': 48,
-        'town': '4',
-        'count': 100,
+        'catalogues': developer_catalog_id,
+        'town': moscow_id,
+        'count': count_vacancies,
     }
     headers = {
         'X-Api-App-Id': sj_api_key
