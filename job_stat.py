@@ -1,6 +1,5 @@
 import requests
 import os
-import argparse
 from statistics import mean
 from terminaltables import AsciiTable
 from dotenv import load_dotenv
@@ -170,13 +169,6 @@ def main():
         'C#',
         'C'
     ]
-    parser = argparse.ArgumentParser(
-        description='''
-        Get statistics on developer vacancies
-        from https://api.hh.ru and https://api.superjob.ru
-        '''
-    )
-    parser.parse_args()
     database_hh = get_salary_statistics_hh(languages)
     database_sj = get_salary_statistics_sj(languages, sj_api_key)
     print(get_table(database_hh, 'HeadHunter Moscow'))
