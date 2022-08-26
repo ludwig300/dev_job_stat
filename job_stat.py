@@ -103,15 +103,15 @@ def get_salary_statistics_hh(languages):
         vacancies_found = dict()
         for vacancies in vacancies_hh:
             vacancies_found[language] = vacancies['found']
-            average_salaries_list = get_average_salaries(
+            average_salaries_vacancies = get_average_salaries(
                 vacancies['items'],
                 average_salaries,
                 predict_rub_salary_hh
             )
         value_statistics['vacancies_found'] = vacancies_found[language]
-        value_statistics['vacancies_processed'] = len(average_salaries_list)
+        value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
         value_statistics['average_salary'] = get_average_salary(
-            average_salaries_list
+            average_salaries_vacancies
         )
         salary_statistics[language] = value_statistics
     return salary_statistics
@@ -125,15 +125,15 @@ def get_salary_statistics_sj(languages, sj_api_key):
         value_statistics = dict()
         vacancies_found = dict()
         vacancies_found[language] = vacancies_sj['total']
-        average_salaries_list = get_average_salaries(
+        average_salaries_vacancies = get_average_salaries(
             vacancies_sj['objects'],
             average_salaries,
             predict_rub_salary_for_superJob
         )
         value_statistics['vacancies_found'] = vacancies_found[language]
-        value_statistics['vacancies_processed'] = len(average_salaries_list)
+        value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
         value_statistics['average_salary'] = get_average_salary(
-            average_salaries_list
+            average_salaries_vacancies
         )
         salary_statistics[language] = value_statistics
     return salary_statistics
