@@ -37,38 +37,30 @@ def get_average_salaries(vacancies, average_salaries, func):
     return average_salaries
 
 
-def get_average_salary(average_salaries):
-    average_salary = mean(average_salaries)
-    return int(average_salary)
+def expected_salary(salary_from, salary_to):
+    if salary_from and salary_to:
+        return int((salary_from + salary_to) / 2)
+    elif salary_to:
+        return int(salary_to * 0.8)
+    elif salary_from:
+        return int(salary_from * 1.2)
 
 
 def predict_rub_salary_hh(vacancy):
     salary_from, salary_to = vacancy['salary']['from'], vacancy['salary']['to']
     currency = vacancy['salary']['currency']
     if 'RUR' in currency:
-        if not salary_from:
-            average_salary = salary_to * 0.8
-        elif not salary_to:
-            average_salary = salary_from * 1.2
-        else:
-            average_salary = (salary_from + salary_to) // 2
+        average_salary = expected_salary(salary_from, salary_to) 
     else:
         average_salary = None
-    return average_salary
+    return average_salary 
 
 
-def predict_rub_salary_for_superJob(vacancy):
+def predict_rub_salary_for_superjob(vacancy):
     salary_from, salary_to = vacancy['payment_from'], vacancy['payment_to']
     currency = vacancy['currency']
     if 'rub' in currency:
-        if salary_from > 0 and salary_to == 0:
-            average_salary = salary_from * 1.2
-        elif salary_to > 0 and salary_from == 0:
-            average_salary = salary_to * 0.8
-        elif salary_to == 0 and salary_from == 0:
-            average_salary = None
-        else:
-            average_salary = (salary_from + salary_to) // 2
+        average_salary = expected_salary(salary_from, salary_to)
     else:
         average_salary = None
     return average_salary
@@ -110,9 +102,7 @@ def get_salary_statistics_hh(languages):
             )
         value_statistics['vacancies_found'] = vacancies_found[language]
         value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
-        value_statistics['average_salary'] = get_average_salary(
-            average_salaries_vacancies
-        )
+        value_statistics['average_salary'] = int(mean(average_salaries_vacancies))
         salary_statistics[language] = value_statistics
     return salary_statistics
 
@@ -128,13 +118,11 @@ def get_salary_statistics_sj(languages, sj_api_key):
         average_salaries_vacancies = get_average_salaries(
             vacancies_sj['objects'],
             average_salaries,
-            predict_rub_salary_for_superJob
+            predict_rub_salary_for_superjob
         )
         value_statistics['vacancies_found'] = vacancies_found[language]
         value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
-        value_statistics['average_salary'] = get_average_salary(
-            average_salaries_vacancies
-        )
+        value_statistics['average_salary'] = int(mean(average_salaries_vacancies))
         salary_statistics[language] = value_statistics
     return salary_statistics
 
