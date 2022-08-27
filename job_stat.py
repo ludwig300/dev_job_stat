@@ -136,8 +136,8 @@ def get_salary_statistics_hh(languages):
     return salary_statistics
 
 
-def get_table(database, title):
-    table_data = [
+def get_table(table_elements, title):
+    table_template = [
         [
             'Язык программирования',
             'Вакансий найдено',
@@ -145,16 +145,16 @@ def get_table(database, title):
             'Средняя зарплата'
         ],
     ]
-    for element in database:
-        table_data.append(
+    for element in table_elements:
+        table_template.append(
             [
                 element,
-                database[element]['vacancies_found'],
-                database[element]['vacancies_processed'],
-                database[element]['average_salary']
+                table_elements[element]['vacancies_found'],
+                table_elements[element]['vacancies_processed'],
+                table_elements[element]['average_salary']
             ]
         )
-    table = AsciiTable(table_data, title)
+    table = AsciiTable(table_template, title)
     return table.table
 
 
