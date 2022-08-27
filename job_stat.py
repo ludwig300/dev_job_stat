@@ -78,10 +78,10 @@ def predict_rub_salary_hh(vacancy):
     salary_from, salary_to = vacancy['salary']['from'], vacancy['salary']['to']
     currency = vacancy['salary']['currency']
     if 'RUR' in currency:
-        average_salary = expected_salary(salary_from, salary_to) 
+        average_salary = expected_salary(salary_from, salary_to)
     else:
         average_salary = None
-    return average_salary 
+    return average_salary
 
 
 def predict_rub_salary_for_superjob(vacancy):
@@ -103,14 +103,20 @@ def get_salary_statistics_sj(languages, sj_api_key):
         vacancies_found = dict()
         for vacancies in vacancies_sj:
             vacancies_found[language] = vacancies['total']
-            average_salaries_vacancies = get_average_salaries( 
+            average_salaries_vacancies = get_average_salaries(
                 vacancies['objects'],
                 average_salaries,
                 predict_rub_salary_for_superjob
             )
         value_statistics['vacancies_found'] = vacancies_found[language]
-        value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
-        value_statistics['average_salary'] = int(mean(average_salaries_vacancies))
+        value_statistics['vacancies_processed'] = len(
+            average_salaries_vacancies
+        )
+        value_statistics['average_salary'] = int(
+            mean(
+                average_salaries_vacancies
+            )
+        )
         salary_statistics[language] = value_statistics
     return salary_statistics
 
@@ -130,8 +136,14 @@ def get_salary_statistics_hh(languages):
                 predict_rub_salary_hh
             )
         value_statistics['vacancies_found'] = vacancies_found[language]
-        value_statistics['vacancies_processed'] = len(average_salaries_vacancies)
-        value_statistics['average_salary'] = int(mean(average_salaries_vacancies))
+        value_statistics['vacancies_processed'] = len(
+            average_salaries_vacancies
+        )
+        value_statistics['average_salary'] = int(
+            mean(
+                average_salaries_vacancies
+            )
+        )
         salary_statistics[language] = value_statistics
     return salary_statistics
 
