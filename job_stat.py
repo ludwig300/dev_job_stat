@@ -21,8 +21,9 @@ def get_vacancies_from_api_hh(dev_language):
         api_url = 'https://api.hh.ru/vacancies'
         response = requests.get(api_url, params=payload)
         response.raise_for_status()
-        vacancies.append(response.json())
-        pages_number = response.json()['pages']
+        response_json = response.json()
+        vacancies.append(response_json)
+        pages_number = response_json['pages']
         page += 1
     return vacancies
 
@@ -46,10 +47,10 @@ def get_vacancies_from_api_sj(language, sj_api_key):
     while page < pages_number:
         response = requests.get(api_url, headers=headers, params=payload)
         response.raise_for_status()
-        page_data = response.json()
-        vacancies.append(page_data)
+        response_json = response.json()
+        vacancies.append(response_json)
         page = payload['page']
-        if not page_data['more']:
+        if not response_json['more']:
             break
         payload['page'] = page + 1
     return vacancies
@@ -65,7 +66,7 @@ def get_average_salaries(vacancies, average_salaries, func):
     return average_salaries
 
 
-def expected_salary(salary_from, salary_to):
+def get_expected_salary(salary_from, salary_to):
     if salary_from and salary_to:
         return int((salary_from + salary_to) / 2)
     elif salary_to:
@@ -78,7 +79,7 @@ def predict_rub_salary_hh(vacancy):
     salary_from, salary_to = vacancy['salary']['from'], vacancy['salary']['to']
     currency = vacancy['salary']['currency']
     if 'RUR' in currency:
-        average_salary = expected_salary(salary_from, salary_to)
+        average_salary = get_expected_salary(salary_from, salary_to)
     else:
         average_salary = None
     return average_salary
@@ -88,7 +89,7 @@ def predict_rub_salary_for_superjob(vacancy):
     salary_from, salary_to = vacancy['payment_from'], vacancy['payment_to']
     currency = vacancy['currency']
     if 'rub' in currency:
-        average_salary = expected_salary(salary_from, salary_to)
+        average_salary = get_expected_salary(salary_from, salary_to)
     else:
         average_salary = None
     return average_salary
@@ -98,23 +99,23 @@ def get_salary_statistics_sj(languages, sj_api_key):
     salary_statistics = dict()
     average_salaries = list()
     for language in languages:
-        vacancies_sj = get_vacancies_from_api_sj(language, sj_api_key)
+        sj_vacancies = get_vacancies_from_api_sj(language, sj_api_key)
         value_statistics = dict()
-        vacancies_found = dict()
-        for vacancies in vacancies_sj:
-            vacancies_found[language] = vacancies['total']
-            average_salaries_vacancies = get_average_salaries(
+        found_vacancies = dict()
+        for vacancies in sj_vacancies:
+            found_vacancies[language] = vacancies['total']
+            vacancies_average_salaries = get_average_salaries(
                 vacancies['objects'],
                 average_salaries,
                 predict_rub_salary_for_superjob
             )
-        value_statistics['vacancies_found'] = vacancies_found[language]
+        value_statistics['vacancies_found'] = found_vacancies[language]
         value_statistics['vacancies_processed'] = len(
-            average_salaries_vacancies
+            vacancies_average_salaries
         )
         value_statistics['average_salary'] = int(
             mean(
-                average_salaries_vacancies
+                vacancies_average_salaries
             )
         )
         salary_statistics[language] = value_statistics
@@ -125,23 +126,23 @@ def get_salary_statistics_hh(languages):
     salary_statistics = dict()
     average_salaries = list()
     for language in languages:
-        vacancies_hh = get_vacancies_from_api_hh(language)
+        hh_vacancies = get_vacancies_from_api_hh(language)
         value_statistics = dict()
-        vacancies_found = dict()
-        for vacancies in vacancies_hh:
-            vacancies_found[language] = vacancies['found']
-            average_salaries_vacancies = get_average_salaries(
+        found_vacancies = dict()
+        for vacancies in hh_vacancies:
+            found_vacancies[language] = vacancies['found']
+            vacancies_average_salaries = get_average_salaries(
                 vacancies['items'],
                 average_salaries,
                 predict_rub_salary_hh
             )
-        value_statistics['vacancies_found'] = vacancies_found[language]
+        value_statistics['vacancies_found'] = found_vacancies[language]
         value_statistics['vacancies_processed'] = len(
-            average_salaries_vacancies
+            vacancies_average_salaries
         )
         value_statistics['average_salary'] = int(
             mean(
-                average_salaries_vacancies
+                vacancies_average_salaries
             )
         )
         salary_statistics[language] = value_statistics
@@ -183,10 +184,10 @@ def main():
         'C#',
         'C'
     ]
-    database_hh = get_salary_statistics_hh(languages)
-    database_sj = get_salary_statistics_sj(languages, sj_api_key)
-    print(get_table(database_hh, 'HeadHunter Moscow'))
-    print(get_table(database_sj, 'SuperJob Moscow'))
+    salary_statistics_hh = get_salary_statistics_hh(languages)
+    salary_statistics_sj = get_salary_statistics_sj(languages, sj_api_key)
+    print(get_table(salary_statistics_hh, 'HeadHunter Moscow'))
+    print(get_table(salary_statistics_sj, 'SuperJob Moscow'))
 
 
 if __name__ == '__main__':
